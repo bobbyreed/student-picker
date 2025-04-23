@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://do0qm4axm06ri"]
+[gd_scene load_steps=5 format=3 uid="uid://do0qm4axm06ri"]
 
 [ext_resource type="Script" path="res://config.gd" id="1_ot30r"]
 [ext_resource type="Script" path="res://picker.gd" id="1_ssm8c"]
 [ext_resource type="Script" path="res://app.gd" id="1_vvtvk"]
 [ext_resource type="Script" path="res://engagement.gd" id="4_lhrxb"]
-[ext_resource type="Script" path="res://openMenu.gd" id="5_rcv7n"]
 
 [node name="PickerCanvasGroup" type="CanvasGroup" node_paths=PackedStringArray("configWindow", "pickerPanel")]
 script = ExtResource("1_vvtvk")
@@ -87,7 +86,7 @@ list = NodePath("StudentList")
 
 [node name="TitleLabel" type="RichTextLabel" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 9.0
+offset_left = 11.0
 offset_right = 249.0
 offset_bottom = 40.0
 tooltip_text = "Insert student names below separated by a comma"
@@ -129,28 +128,6 @@ visible = false
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("4_lhrxb")
-
-[node name="openMenu" type="PopupMenu" parent="."]
-size = Vector2i(250, 300)
-visible = true
-script = ExtResource("5_rcv7n")
-
-[node name="LoadLabel" type="RichTextLabel" parent="openMenu"]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -85.0
-offset_right = 165.0
-offset_bottom = 138.0
-grow_horizontal = 2
-text = "Load previous class?"
-autowrap_mode = 0
-
-[node name="ClassLists" type="ItemList" parent="openMenu"]
-offset_left = 10.0
-offset_top = 40.0
-offset_right = 240.0
-offset_bottom = 80.0
 
 [connection signal="item_selected" from="ConfigWindow/StudentList" to="ConfigWindow" method="_on_student_list_item_selected"]
 [connection signal="pressed" from="ConfigWindow/DeleteStudentButton" to="ConfigWindow" method="_on_delete_student_button_pressed"]
