@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://openMenu.gd" id="5_rcv7n"]
 
 [node name="PickerCanvasGroup" type="CanvasGroup" node_paths=PackedStringArray("configWindow", "pickerPanel")]
+position = Vector2(112, 112)
 script = ExtResource("1_vvtvk")
 configWindow = NodePath("ConfigWindow")
 pickerPanel = NodePath("PickerWindow")
@@ -41,11 +42,12 @@ one_shot = true
 
 [node name="TitleLabel" type="RichTextLabel" parent="ConfigWindow"]
 layout_mode = 0
-offset_left = 11.0
-offset_right = 249.0
-offset_bottom = 40.0
-tooltip_text = "Insert student names below separated by a comma"
-text = "Configuration"
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 248.0
+offset_bottom = 42.0
+tooltip_text = "Insert student names below and hit enter (or comma)"
+text = "Add Students"
 
 [node name="TitleLabel2" type="RichTextLabel" parent="ConfigWindow"]
 layout_mode = 0
@@ -81,7 +83,7 @@ text = "Exit Config"
 
 [node name="PickerWindow" type="Panel" parent="." node_paths=PackedStringArray("list")]
 offset_right = 250.0
-offset_bottom = 300.0
+offset_bottom = 352.0
 script = ExtResource("1_ssm8c")
 list = NodePath("StudentList")
 
@@ -93,7 +95,7 @@ offset_bottom = 40.0
 tooltip_text = "Insert student names below separated by a comma"
 text = "Picker"
 
-[node name="StudentList" type="ItemList" parent="PickerWindow"]
+[node name="StudentList" type="ItemList" parent="PickerWindow" groups=["Persist"]]
 layout_mode = 0
 offset_left = 14.0
 offset_top = 30.0
@@ -102,9 +104,9 @@ offset_bottom = 185.0
 
 [node name="PickButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 61.0
+offset_left = 60.0
 offset_top = 194.0
-offset_right = 185.0
+offset_right = 184.0
 offset_bottom = 225.0
 text = "Pick"
 
@@ -116,12 +118,20 @@ offset_right = 184.0
 offset_bottom = 260.0
 text = "Configure"
 
+[node name="SaveClassButton" type="Button" parent="PickerWindow"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 263.0
+offset_right = 184.0
+offset_bottom = 294.0
+text = "Save Class"
+
 [node name="ExitButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 59.0
-offset_top = 264.0
-offset_right = 183.0
-offset_bottom = 295.0
+offset_left = 45.0
+offset_top = 304.0
+offset_right = 195.0
+offset_bottom = 335.0
 text = "Exit Application"
 
 [node name="EngagementWindow" type="Panel" parent="."]
@@ -132,7 +142,6 @@ script = ExtResource("4_lhrxb")
 
 [node name="openMenu" type="PopupMenu" parent="."]
 size = Vector2i(250, 300)
-visible = true
 script = ExtResource("5_rcv7n")
 
 [node name="LoadLabel" type="RichTextLabel" parent="openMenu"]
@@ -140,13 +149,14 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -85.0
+offset_top = 10.0
 offset_right = 165.0
-offset_bottom = 138.0
+offset_bottom = 148.0
 grow_horizontal = 2
 text = "Load previous class?"
 autowrap_mode = 0
 
-[node name="ClassLists" type="ItemList" parent="openMenu"]
+[node name="ClassLists" type="ItemList" parent="openMenu" groups=["Persist"]]
 offset_left = 10.0
 offset_top = 40.0
 offset_right = 240.0
@@ -158,4 +168,5 @@ offset_bottom = 80.0
 [connection signal="item_selected" from="PickerWindow/StudentList" to="PickerWindow" method="_on_student_list_item_selected"]
 [connection signal="pressed" from="PickerWindow/PickButton" to="PickerWindow" method="_on_pick_button_pressed"]
 [connection signal="pressed" from="PickerWindow/ConfigButton" to="." method="_on_config_button_pressed"]
+[connection signal="pressed" from="PickerWindow/SaveClassButton" to="." method="_on_save_class_button_pressed"]
 [connection signal="pressed" from="PickerWindow/ExitButton" to="." method="_on_exit_button_pressed"]
