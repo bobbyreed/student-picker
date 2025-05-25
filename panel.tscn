@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://do0qm4axm06ri"]
+[gd_scene load_steps=7 format=3 uid="uid://do0qm4axm06ri"]
 
 [ext_resource type="Script" path="res://config.gd" id="1_ot30r"]
 [ext_resource type="Script" path="res://picker.gd" id="1_ssm8c"]
 [ext_resource type="Script" path="res://app.gd" id="1_vvtvk"]
+[ext_resource type="Script" path="res://student_list.gd" id="3_kam7p"]
 [ext_resource type="Script" path="res://engagement.gd" id="4_lhrxb"]
 [ext_resource type="Script" path="res://openMenu.gd" id="5_rcv7n"]
 
@@ -64,6 +65,7 @@ offset_left = 14.0
 offset_top = 146.0
 offset_right = 218.0
 offset_bottom = 225.0
+script = ExtResource("3_kam7p")
 
 [node name="DeleteStudentButton" type="Button" parent="ConfigWindow"]
 layout_mode = 0
@@ -83,7 +85,7 @@ text = "Exit Config"
 
 [node name="PickerWindow" type="Panel" parent="." node_paths=PackedStringArray("list")]
 offset_right = 250.0
-offset_bottom = 352.0
+offset_bottom = 392.0
 script = ExtResource("1_ssm8c")
 list = NodePath("StudentList")
 
@@ -101,6 +103,7 @@ offset_left = 14.0
 offset_top = 30.0
 offset_right = 218.0
 offset_bottom = 185.0
+script = ExtResource("3_kam7p")
 
 [node name="PickButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
@@ -126,12 +129,20 @@ offset_right = 184.0
 offset_bottom = 294.0
 text = "Save Class"
 
+[node name="LoadClassButton" type="Button" parent="PickerWindow"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 298.0
+offset_right = 184.0
+offset_bottom = 329.0
+text = "Load Class"
+
 [node name="ExitButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 45.0
-offset_top = 304.0
-offset_right = 195.0
-offset_bottom = 335.0
+offset_left = 48.0
+offset_top = 344.0
+offset_right = 198.0
+offset_bottom = 375.0
 text = "Exit Application"
 
 [node name="EngagementWindow" type="Panel" parent="."]
@@ -162,6 +173,38 @@ offset_top = 40.0
 offset_right = 240.0
 offset_bottom = 80.0
 
+[node name="taskPrompt" type="PopupMenu" parent="."]
+position = Vector2i(200, 60)
+size = Vector2i(300, 200)
+
+[node name="PromptTitle" type="RichTextLabel" parent="taskPrompt"]
+offset_left = 3.445
+offset_top = 1.865
+offset_right = 103.445
+offset_bottom = 41.865
+text = "Prompt"
+
+[node name="StudentName" type="RichTextLabel" parent="taskPrompt"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_bottom = 40.0
+grow_horizontal = 0
+text = "Student Assigned"
+
+[node name="PromptText" type="RichTextLabel" parent="taskPrompt"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 30.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "The world as we know it will soon change. What can we do? Nothing. Give up, peasants!"
+
 [connection signal="item_selected" from="ConfigWindow/StudentList" to="ConfigWindow" method="_on_student_list_item_selected"]
 [connection signal="pressed" from="ConfigWindow/DeleteStudentButton" to="ConfigWindow" method="_on_delete_student_button_pressed"]
 [connection signal="pressed" from="ConfigWindow/ExitButton" to="ConfigWindow" method="_on_exit_button_pressed"]
@@ -169,4 +212,5 @@ offset_bottom = 80.0
 [connection signal="pressed" from="PickerWindow/PickButton" to="PickerWindow" method="_on_pick_button_pressed"]
 [connection signal="pressed" from="PickerWindow/ConfigButton" to="." method="_on_config_button_pressed"]
 [connection signal="pressed" from="PickerWindow/SaveClassButton" to="." method="_on_save_class_button_pressed"]
+[connection signal="pressed" from="PickerWindow/LoadClassButton" to="." method="_on_load_class_button_pressed"]
 [connection signal="pressed" from="PickerWindow/ExitButton" to="." method="_on_exit_button_pressed"]
