@@ -221,4 +221,4 @@ text = "The world as we know it will soon change. What can we do? Nothing. Give 
 [connection signal="pressed" from="PickerWindow/SaveClassButton" to="." method="_on_save_class_button_pressed"]
 [connection signal="pressed" from="PickerWindow/LoadClassButton" to="." method="_on_load_class_button_pressed"]
 [connection signal="pressed" from="PickerWindow/ExitButton" to="." method="_on_exit_button_pressed"]
-[connection signal="text_set" from="PickerWindow/ClassNameEdit" to="." method="_on_class_name_edit_text_set"]
+[connection signal="text_changed" from="PickerWindow/ClassNameEdit" to="." method="_on_class_name_edit_text_changed"]
