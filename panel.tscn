@@ -84,7 +84,7 @@ offset_bottom = 295.0
 text = "Exit Config"
 
 [node name="PickerWindow" type="Panel" parent="." node_paths=PackedStringArray("list")]
-offset_right = 250.0
+offset_right = 270.0
 offset_bottom = 392.0
 script = ExtResource("1_ssm8c")
 list = NodePath("StudentList")
@@ -99,51 +99,58 @@ text = "Picker"
 
 [node name="StudentList" type="ItemList" parent="PickerWindow" groups=["Persist"]]
 layout_mode = 0
-offset_left = 14.0
+offset_left = 24.0
 offset_top = 30.0
-offset_right = 218.0
+offset_right = 228.0
 offset_bottom = 185.0
 script = ExtResource("3_kam7p")
 
 [node name="PickButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 60.0
+offset_left = 70.0
 offset_top = 194.0
-offset_right = 184.0
+offset_right = 194.0
 offset_bottom = 225.0
 text = "Pick"
 
 [node name="ConfigButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 60.0
+offset_left = 70.0
 offset_top = 229.0
-offset_right = 184.0
+offset_right = 194.0
 offset_bottom = 260.0
 text = "Configure"
 
 [node name="SaveClassButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 60.0
-offset_top = 263.0
-offset_right = 184.0
-offset_bottom = 294.0
+offset_left = 9.0
+offset_top = 264.0
+offset_right = 133.0
+offset_bottom = 295.0
 text = "Save Class"
 
 [node name="LoadClassButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 60.0
+offset_left = 70.0
 offset_top = 298.0
-offset_right = 184.0
+offset_right = 194.0
 offset_bottom = 329.0
 text = "Load Class"
 
 [node name="ExitButton" type="Button" parent="PickerWindow"]
 layout_mode = 0
-offset_left = 48.0
+offset_left = 58.0
 offset_top = 344.0
-offset_right = 198.0
+offset_right = 208.0
 offset_bottom = 375.0
 text = "Exit Application"
+
+[node name="ClassNameEdit" type="TextEdit" parent="PickerWindow"]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 264.0
+offset_right = 262.0
+offset_bottom = 295.0
 
 [node name="EngagementWindow" type="Panel" parent="."]
 visible = false
@@ -214,3 +221,4 @@ text = "The world as we know it will soon change. What can we do? Nothing. Give 
 [connection signal="pressed" from="PickerWindow/SaveClassButton" to="." method="_on_save_class_button_pressed"]
 [connection signal="pressed" from="PickerWindow/LoadClassButton" to="." method="_on_load_class_button_pressed"]
 [connection signal="pressed" from="PickerWindow/ExitButton" to="." method="_on_exit_button_pressed"]
+[connection signal="text_set" from="PickerWindow/ClassNameEdit" to="." method="_on_class_name_edit_text_set"]

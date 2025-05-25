@@ -210,3 +210,7 @@ func _on_save_class_button_pressed():
 
 func _on_load_class_button_pressed() -> void:
 	loadData()
+
+
+func _on_class_name_edit_text_set() -> void:
+	pass # Replace with function body.
