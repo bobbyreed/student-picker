@@ -54,6 +54,11 @@ func _on_exit_button_pressed() -> void:
 	#closes the config window
 	configPanel.hide()
 	pickerPanel.show()
+	
+	# Clear the picker list completely to prevent duplication
+	pickList.clear()
+	
+	# Now add all current students from config list to picker list
 	for n in list.item_count:
 		pickList.add_item(list.get_item_text(n))
 	
