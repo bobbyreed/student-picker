@@ -14,10 +14,20 @@ var course_name_input: LineEdit
 var load_dialog: AcceptDialog
 var course_list: ItemList
 
+# New variables for copy/delete functionality
+var copy_button: Button
+var delete_button: Button
+var selected_course_index: int = -1
+var confirm_delete_dialog: ConfirmationDialog
+var copy_name_dialog: AcceptDialog
+var copy_name_input: LineEdit
+
 # Called when the node enters the scene tree for the first time
 func _ready():
 	setup_save_dialog()
 	setup_load_dialog()
+	setup_confirm_delete_dialog()
+	setup_copy_name_dialog()
 	print("StudentPicker application initialized successfully")
 
 # Called every frame
@@ -68,10 +78,10 @@ func setup_save_dialog():
 
 # Creates the popup dialog for loading courses
 func setup_load_dialog():
-	# Create the main dialog container
+	# Create the main dialog container with larger size to accommodate buttons
 	load_dialog = AcceptDialog.new()
 	load_dialog.title = "Load Course List"
-	load_dialog.size = Vector2(400, 300)
+	load_dialog.size = Vector2(450, 350)
 	
 	# Create a vertical container for organization
 	var vbox = VBoxContainer.new()
@@ -79,7 +89,7 @@ func setup_load_dialog():
 	
 	# Add explanatory label
 	var label = Label.new()
-	label.text = "Select a course to load:"
+	label.text = "Select a course to load, copy, or delete:"
 	label.add_theme_font_size_override("font_size", 14)
 	vbox.add_child(label)
 	
@@ -89,9 +99,33 @@ func setup_load_dialog():
 	course_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vbox.add_child(course_list)
 	
+	# Create horizontal container for action buttons
+	var button_container = HBoxContainer.new()
+	button_container.add_theme_constant_override("separation", 10)
+	button_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	
+	# Create Copy button
+	copy_button = Button.new()
+	copy_button.text = "Copy Course"
+	copy_button.custom_minimum_size = Vector2(100, 30)
+	copy_button.disabled = true  # Start disabled until selection
+	copy_button.pressed.connect(_on_copy_button_pressed)
+	button_container.add_child(copy_button)
+	
+	# Create Delete button
+	delete_button = Button.new()
+	delete_button.text = "Delete Course"
+	delete_button.custom_minimum_size = Vector2(100, 30)
+	delete_button.disabled = true  # Start disabled until selection
+	delete_button.modulate = Color(1.0, 0.8, 0.8)  # Slight red tint for delete
+	delete_button.pressed.connect(_on_delete_button_pressed)
+	button_container.add_child(delete_button)
+	
+	vbox.add_child(button_container)
+	
 	# Add helpful instruction text
 	var help_label = Label.new()
-	help_label.text = "Double-click a course or select it and click OK to load"
+	help_label.text = "Double-click to load, or select and use buttons above"
 	help_label.add_theme_font_size_override("font_size", 10)
 	help_label.modulate = Color.GRAY
 	vbox.add_child(help_label)
@@ -103,11 +137,250 @@ func setup_load_dialog():
 	load_dialog.confirmed.connect(_on_load_dialog_confirmed)
 	course_list.item_selected.connect(_on_course_selected)
 	course_list.item_activated.connect(_on_course_activated)
+	# Note: ItemList doesn't have a nothing_selected signal
+	# We'll handle deselection through other means
+	
+	# Optional: Connect to empty_clicked if you want to detect clicks on empty space
+	course_list.empty_clicked.connect(_on_course_list_empty_clicked)
 	
 	# Add to scene tree
 	add_child(load_dialog)
 	
-	print("Load dialog system initialized")
+	print("Load dialog system initialized with copy/delete functionality")
+
+# Creates confirmation dialog for delete operations
+func setup_confirm_delete_dialog():
+	confirm_delete_dialog = ConfirmationDialog.new()
+	confirm_delete_dialog.title = "Confirm Delete"
+	confirm_delete_dialog.dialog_text = "Are you sure you want to delete this course?\nThis action cannot be undone."
+	confirm_delete_dialog.size = Vector2(300, 150)
+	
+	# Connect the confirmation signal
+	confirm_delete_dialog.confirmed.connect(_on_delete_confirmed)
+	
+	# Add to scene tree
+	add_child(confirm_delete_dialog)
+	
+	print("Delete confirmation dialog initialized")
+
+# Creates dialog for entering copy name
+func setup_copy_name_dialog():
+	copy_name_dialog = AcceptDialog.new()
+	copy_name_dialog.title = "Copy Course"
+	copy_name_dialog.size = Vector2(350, 120)
+	
+	# Create a vertical container
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	
+	# Add label
+	var label = Label.new()
+	label.text = "Enter a name for the copied course:"
+	label.add_theme_font_size_override("font_size", 14)
+	vbox.add_child(label)
+	
+	# Create text input
+	copy_name_input = LineEdit.new()
+	copy_name_input.placeholder_text = "e.g., Spring 2025 - Biology 101 (Copy)"
+	copy_name_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.add_child(copy_name_input)
+	
+	# Add to dialog
+	copy_name_dialog.add_child(vbox)
+	
+	# Connect signals
+	copy_name_dialog.confirmed.connect(_on_copy_name_confirmed)
+	copy_name_input.text_submitted.connect(_on_copy_name_submitted)
+	
+	# Add to scene tree
+	add_child(copy_name_dialog)
+	
+	print("Copy name dialog initialized")
+
+# New handler for Copy button
+func _on_copy_button_pressed():
+	if selected_course_index < 0 or selected_course_index >= course_list.item_count:
+		print("No valid course selected for copying")
+		return
+	
+	# Get the original course name
+	var original_name = course_list.get_item_text(selected_course_index)
+	
+	# Pre-populate the copy dialog with a suggested name
+	copy_name_input.text = original_name + " (Copy)"
+	copy_name_input.select_all()  # Select all text for easy replacement
+	
+	# Show the copy name dialog
+	copy_name_dialog.popup_centered()
+	copy_name_input.grab_focus()
+
+# New handler for Delete button
+func _on_delete_button_pressed():
+	if selected_course_index < 0 or selected_course_index >= course_list.item_count:
+		print("No valid course selected for deletion")
+		return
+	
+	# Get the course name for the confirmation message
+	var course_name = course_list.get_item_text(selected_course_index)
+	confirm_delete_dialog.dialog_text = "Are you sure you want to delete:\n\n\"" + course_name + "\"?\n\nThis action cannot be undone."
+	
+	# Show confirmation dialog
+	confirm_delete_dialog.popup_centered()
+
+# Handler for delete confirmation
+func _on_delete_confirmed():
+	if selected_course_index < 0 or selected_course_index >= course_list.item_count:
+		return
+	
+	var course_name = course_list.get_item_text(selected_course_index)
+	
+	# Delete the course file
+	if delete_course(course_name):
+		print("Successfully deleted course: " + course_name)
+		# Refresh the list to show the deletion
+		refresh_course_list()
+		# Reset selection
+		selected_course_index = -1
+		copy_button.disabled = true
+		delete_button.disabled = true
+	else:
+		print("Failed to delete course: " + course_name)
+
+# Handler for copy name confirmation
+func _on_copy_name_confirmed():
+	var new_name = copy_name_input.text.strip_edges()
+	if new_name.is_empty():
+		print("Copy name cannot be empty")
+		return
+	
+	perform_course_copy(new_name)
+
+func _on_copy_name_submitted(text: String):
+	copy_name_dialog.hide()
+	var new_name = text.strip_edges()
+	if not new_name.is_empty():
+		perform_course_copy(new_name)
+
+# Performs the actual course copy operation
+func perform_course_copy(new_course_name: String):
+	if selected_course_index < 0 or selected_course_index >= course_list.item_count:
+		return
+	
+	var original_name = course_list.get_item_text(selected_course_index)
+	
+	# Check if a course with the new name already exists
+	var existing_courses = get_saved_courses()
+	if new_course_name in existing_courses:
+		print("A course with the name '" + new_course_name + "' already exists")
+		# You might want to show an error dialog here
+		return
+	
+	# Copy the course
+	if copy_course(original_name, new_course_name):
+		print("Successfully copied course from '" + original_name + "' to '" + new_course_name + "'")
+		# Refresh the list to show the new copy
+		refresh_course_list()
+	else:
+		print("Failed to copy course")
+
+# Function to copy a course save file
+func copy_course(original_name: String, new_name: String) -> bool:
+	# Create safe filenames
+	var original_safe = original_name.to_lower().replace(" ", "_").replace("/", "_")
+	var new_safe = new_name.to_lower().replace(" ", "_").replace("/", "_")
+	
+	var original_path = "user://course_" + original_safe + ".save"
+	var new_path = "user://course_" + new_safe + ".save"
+	
+	# Check if original file exists
+	if not FileAccess.file_exists(original_path):
+		print("Original course file not found: " + original_path)
+		return false
+	
+	# Read the original file
+	var original_file = FileAccess.open(original_path, FileAccess.READ)
+	if original_file == null:
+		print("Could not open original file for reading")
+		return false
+	
+	# Create the new file
+	var new_file = FileAccess.open(new_path, FileAccess.WRITE)
+	if new_file == null:
+		print("Could not create new file for writing")
+		original_file.close()
+		return false
+	
+	# Copy contents line by line, updating the course name
+	while original_file.get_position() < original_file.get_length():
+		var line = original_file.get_line()
+		
+		# Parse and update the course name in the JSON data
+		var json = JSON.new()
+		var parse_result = json.parse(line)
+		
+		if parse_result == OK and json.data is Dictionary:
+			var data = json.data
+			# Update the course name in the saved data
+			if data.has("course_name"):
+				data["course_name"] = new_name
+			# Update timestamp to current time
+			data["save_timestamp"] = Time.get_unix_time_from_system()
+			
+			# Write updated data
+			new_file.store_line(JSON.stringify(data))
+		else:
+			# If parsing fails, just copy the line as-is
+			new_file.store_line(line)
+	
+	# Close both files
+	original_file.close()
+	new_file.close()
+	
+	return true
+
+# Function to delete a course save file
+func delete_course(course_name: String) -> bool:
+	var safe_name = course_name.to_lower().replace(" ", "_").replace("/", "_")
+	var file_path = "user://course_" + safe_name + ".save"
+	
+	if not FileAccess.file_exists(file_path):
+		print("Course file not found: " + file_path)
+		return false
+	
+	# Delete the file
+	var dir = DirAccess.open("user://")
+	if dir == null:
+		print("Could not access user directory")
+		return false
+	
+	var error = dir.remove(file_path)
+	if error != OK:
+		print("Failed to delete file: " + file_path + " (Error: " + str(error) + ")")
+		return false
+	
+	return true
+
+# Update course selection handler to enable/disable buttons
+func _on_course_selected(index: int):
+	selected_course_index = index
+	
+	# Enable action buttons when a course is selected
+	copy_button.disabled = false
+	delete_button.disabled = false
+	
+	if index >= 0 and index < course_list.item_count:
+		var selected_course = course_list.get_item_text(index)
+		print("Course selected: " + selected_course)
+
+# Handler for when empty space is clicked in the course list
+func _on_course_list_empty_clicked(position: Vector2, mouse_button_index: int):
+	# This is called when the user clicks on empty space in the ItemList
+	# We can use this to deselect items and disable buttons
+	course_list.deselect_all()
+	selected_course_index = -1
+	copy_button.disabled = true
+	delete_button.disabled = true
+	print("Course list deselected")
 
 # Signal handlers for save dialog
 func _on_save_class_button_pressed():
@@ -130,16 +403,14 @@ func _on_load_class_button_pressed():
 	# Populate the course list with current available courses
 	refresh_course_list()
 	
+	# Reset button states
+	selected_course_index = -1
+	copy_button.disabled = true
+	delete_button.disabled = true
+	
 	# Show the load dialog
 	load_dialog.popup_centered()
 	print("Load dialog opened")
-
-func _on_course_selected(index: int):
-	# This fires when user clicks on a course in the list
-	# We store the selected course name for potential loading
-	if index >= 0 and index < course_list.item_count:
-		var selected_course = course_list.get_item_text(index)
-		print("Course selected: " + selected_course)
 
 func _on_course_activated(index: int):
 	# This fires when user double-clicks a course in the list
@@ -170,6 +441,9 @@ func refresh_course_list():
 	
 	# Get all available courses from the file system
 	var available_courses = get_saved_courses()
+	
+	# Sort courses alphabetically for better organization
+	available_courses.sort()
 	
 	# Add each course to the list widget
 	for course_name in available_courses:
