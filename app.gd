@@ -3,6 +3,7 @@ extends CanvasGroup
 # Export variables for connecting nodes from the editor
 @export var configWindow : Panel
 @export var pickerPanel : Panel
+@export var taskPromptPanel : PopupMenu
 
 # Constants for file paths
 const SAVE_FILE_PATH = "user://savegame.save"

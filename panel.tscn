@@ -1,16 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://do0qm4axm06ri"]
+[gd_scene load_steps=7 format=3 uid="uid://do0qm4axm06ri"]
 
 [ext_resource type="Script" path="res://config.gd" id="1_ot30r"]
 [ext_resource type="Script" path="res://picker.gd" id="1_ssm8c"]
 [ext_resource type="Script" path="res://app.gd" id="1_vvtvk"]
 [ext_resource type="Script" path="res://student_list.gd" id="3_kam7p"]
 [ext_resource type="Script" path="res://engagement.gd" id="4_lhrxb"]
+[ext_resource type="Script" path="res://task_prompt.gd" id="6_rxp5l"]
 
-[node name="PickerCanvasGroup" type="CanvasGroup" node_paths=PackedStringArray("configWindow", "pickerPanel")]
+[node name="PickerCanvasGroup" type="CanvasGroup" node_paths=PackedStringArray("configWindow", "pickerPanel", "taskPromptPanel")]
 position = Vector2(112, 112)
 script = ExtResource("1_vvtvk")
 configWindow = NodePath("ConfigWindow")
 pickerPanel = NodePath("PickerWindow")
+taskPromptPanel = NodePath("taskPrompt")
 
 [node name="ConfigWindow" type="Panel" parent="." node_paths=PackedStringArray("textEditor", "title", "subtitle", "list", "pickList", "deleteButton", "exitButton", "timer", "configPanel", "pickerPanel")]
 visible = false
@@ -82,11 +84,15 @@ offset_right = 183.0
 offset_bottom = 295.0
 text = "Exit Config"
 
-[node name="PickerWindow" type="Panel" parent="." node_paths=PackedStringArray("list")]
+[node name="PickerWindow" type="Panel" parent="." node_paths=PackedStringArray("list", "taskPrompt", "promptTitle", "studentName", "promptText")]
 offset_right = 270.0
 offset_bottom = 392.0
 script = ExtResource("1_ssm8c")
 list = NodePath("StudentList")
+taskPrompt = NodePath("../taskPrompt")
+promptTitle = NodePath("../taskPrompt/PromptTitle")
+studentName = NodePath("../taskPrompt/StudentName")
+promptText = NodePath("../taskPrompt/PromptText")
 
 [node name="TitleLabel" type="RichTextLabel" parent="PickerWindow"]
 layout_mode = 0
@@ -150,9 +156,13 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("4_lhrxb")
 
-[node name="taskPrompt" type="PopupMenu" parent="."]
+[node name="taskPrompt" type="PopupMenu" parent="." node_paths=PackedStringArray("promptTitle", "studentLabel", "promptText")]
 position = Vector2i(200, 60)
 size = Vector2i(300, 200)
+script = ExtResource("6_rxp5l")
+promptTitle = NodePath("PromptTitle")
+studentLabel = NodePath("StudentName")
+promptText = NodePath("PromptText")
 
 [node name="PromptTitle" type="RichTextLabel" parent="taskPrompt"]
 offset_left = 3.445
